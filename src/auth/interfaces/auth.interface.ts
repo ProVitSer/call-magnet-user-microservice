@@ -20,3 +20,11 @@ export type JwtPayload = JwtPayloadDataAdapter;
 export interface RequestWithUser extends Request {
     user: JwtPayload;
 }
+
+export interface RegisterUser {
+    firstname: string;
+    lastname: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+}

@@ -1,13 +1,14 @@
 import { Controller } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { RegisterUser } from './interfaces/auth.interface';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
-    @MessagePattern({ cmd: 'validate-token' })
-    async validateToken(@Payload() data: any): Promise<any> {
-        return this.authService.validate(data);
+    @MessagePattern({ cmd: 'register' })
+    async register(@Payload() data: RegisterUser): Promise<{ message: string }> {
+        return await this.authService.register(data);
     }
 }
