@@ -23,7 +23,7 @@ export class AuthService {
 
         if (user) {
             this.log.error('user ' + user.email + ' already exists in database');
-            throw new RpcException(new UserAlreadyExistsException(`Профиль пользователя с email: ${user.email} зарегистрирован`));
+            throw new RpcException(new UserAlreadyExistsException(user.email));
         }
 
         const createdUser = await this.usersService.addUser(data);
