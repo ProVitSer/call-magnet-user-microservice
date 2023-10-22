@@ -29,7 +29,7 @@ export class User extends Document {
     status: Status;
 
     @Prop({ default: false })
-    isActive: boolean;
+    isValide: boolean;
 
     @Prop({ default: '' })
     validationToken: string;
