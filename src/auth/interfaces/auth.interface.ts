@@ -28,3 +28,7 @@ export interface RegisterUser {
     phoneNumber: string;
     password: string;
 }
+
+export interface VerifyUser {
+    token: string;
+}
