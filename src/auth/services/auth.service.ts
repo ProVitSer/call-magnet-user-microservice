@@ -2,14 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { AppLoggerService } from '@app/app-logger/app-logger.service';
 import { TokenService } from './token.service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { RegisterUser, VerifyUser } from '../interfaces/auth.interface';
+import { RegisterUser, ResetPassword, UpdatePassword, VerifyUser } from '../interfaces/auth.interface';
 import { UserAlreadyExistsException, UserSendMailErrorException } from '@app/users/exceptions';
 import { JwtPayloadDataAdapter } from '../adapters/jwt-payload-data.adapter';
 import { firstValueFrom } from 'rxjs';
-import { USER_CREATE_SUCCESS, USRR_ACTIVATE_SUCCESS } from '../auth.consts';
+import { CONFIRM_UPDATE_PASSWORD, PASSWORD_UPDATE_SUCCESS, USER_CREATE_SUCCESS, USRR_ACTIVATE_SUCCESS } from '../auth.consts';
 import { UsersService } from '@app/users/users.service';
 import { UserVerifyProfileException } from '@app/users/exceptions/user-verify-profile.exeption';
 import { UserIsActiveException } from '@app/users/exceptions/user-is-active.exeption';
+import * as argon2 from 'argon2';
+import { UserNotExistsException } from '@app/users/exceptions/user-not-exist.exeption';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -66,5 +69,48 @@ export class AuthService {
         }
 
         throw new RpcException(new UserVerifyProfileException());
+    }
+
+    public async resetPassword(data: ResetPassword): Promise<{ message: string }> {
+        const user = await this.usersService.findUser({ email: data.email });
+
+        if (!user) {
+            this.log.error('resetPassword attempt : user does not exist ' + data.email);
+            throw new RpcException(new UserNotExistsException());
+        }
+
+        const validationToken = uuidv4();
+        await this.usersService.updateByClientId(user.clientId, { validationToken });
+
+        try {
+            await firstValueFrom(this.mailService.send({ cmd: 'reset-password-email' }, { email: data.email, token: validationToken }));
+        } catch (e) {
+            this.log.error('resetPassword attempt : Bad request' + data.email);
+
+            throw new RpcException(new UserSendMailErrorException(data.email));
+        }
+
+        this.log.debug('resetPassword : mail sent for user ' + data.email);
+        return {
+            message: CONFIRM_UPDATE_PASSWORD,
+        };
+    }
+
+    public async updatePassword(data: UpdatePassword): Promise<{ message: string }> {
+        const user = await this.usersService.findUser({ validationToken: data.token });
+        if (!user) {
+            this.log.error('updatePassword: user does not exist');
+            throw new RpcException(new UserNotExistsException());
+        }
+
+        const hash = await argon2.hash(data.password);
+
+        await this.usersService.updateByClientId(user.clientId, { password: hash });
+
+        this.log.debug('updatePassword : user ID ' + user._id + ' updated password');
+
+        return {
+            message: PASSWORD_UPDATE_SUCCESS,
+        };
     }
 }

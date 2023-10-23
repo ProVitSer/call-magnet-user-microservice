@@ -32,3 +32,12 @@ export interface RegisterUser {
 export interface VerifyUser {
     token: string;
 }
+
+export interface ResetPassword {
+    email: string;
+}
+
+export interface UpdatePassword {
+    token: string;
+    password: string;
+}
