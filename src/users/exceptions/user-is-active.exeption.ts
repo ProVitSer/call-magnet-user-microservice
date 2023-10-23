@@ -1,6 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 
-export class UserIsActiveException extends BadRequestException {
+export class UserIsActiveException extends ForbiddenException {
     constructor(email: string) {
         const message = `Пользователь с email - ${email} уже активирован`;
         super(message);
