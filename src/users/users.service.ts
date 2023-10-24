@@ -10,8 +10,8 @@ import { UserModelAdapter } from './adapters/user-model.adapter';
 export class UsersService {
     constructor(@InjectModel(User.name) readonly userModel: Model<User>, private readonly log: AppLoggerService) {}
 
-    async findUser(filter: object): Promise<User> {
-        const user: User = await this.userModel.findOne({ ...filter }).exec();
+    async findUser(filter: object, projection?: { [key: string]: number }): Promise<User> {
+        const user: User = await this.userModel.findOne({ ...filter }, projection).exec();
         return user;
     }
 
