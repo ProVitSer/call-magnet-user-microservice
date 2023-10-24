@@ -29,10 +29,10 @@ export class User extends Document {
     status: Status;
 
     @Prop({ default: false })
-    isValide: boolean;
+    isEmailVerified: boolean;
 
     @Prop({ default: '' })
-    validationToken: string;
+    validationToken: string | null;
 
     @Prop({ default: [Role.USER] })
     roles: Role[];
