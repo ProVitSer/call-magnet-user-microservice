@@ -13,6 +13,7 @@ export interface GetTokenData {
 export interface GetTokenResult {
     accessToken: string;
     refreshToken: string;
+    accessTokenExpires: number;
 }
 
 export type JwtPayload = JwtPayloadDataAdapter;
@@ -40,4 +41,16 @@ export interface ResetPassword {
 export interface UpdatePassword {
     token: string;
     password: string;
+}
+
+export interface LoginUserRequest {
+    email: string;
+    password?: string;
+}
+
+export type LoginUserResponse = GetTokenResult;
+
+export interface RefreshToken {
+    clientId: string;
+    refreshToken: string;
 }

@@ -2,8 +2,21 @@ import { Inject, Injectable } from '@nestjs/common';
 import { AppLoggerService } from '@app/app-logger/app-logger.service';
 import { TokenService } from './token.service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { RegisterUser, ResetPassword, UpdatePassword, VerifyUser } from '../interfaces/auth.interface';
-import { UserAlreadyExistsException, UserSendMailErrorException } from '@app/users/exceptions';
+import {
+    LoginUserRequest,
+    LoginUserResponse,
+    RefreshToken,
+    RegisterUser,
+    ResetPassword,
+    UpdatePassword,
+    VerifyUser,
+} from '../interfaces/auth.interface';
+import {
+    UserAlreadyExistsException,
+    UserNotActiveException,
+    UserNotFoundException,
+    UserSendMailErrorException,
+} from '@app/users/exceptions';
 import { JwtPayloadDataAdapter } from '../adapters/jwt-payload-data.adapter';
 import { firstValueFrom } from 'rxjs';
 import { CONFIRM_UPDATE_PASSWORD, PASSWORD_UPDATE_SUCCESS, USER_CREATE_SUCCESS, USRR_ACTIVATE_SUCCESS } from '../auth.consts';
@@ -13,6 +26,10 @@ import { UserIsActiveException } from '@app/users/exceptions/user-is-active.exep
 import * as argon2 from 'argon2';
 import { UserNotExistsException } from '@app/users/exceptions/user-not-exist.exeption';
 import { v4 as uuidv4 } from 'uuid';
+import { IncorrectUserPasswordException } from '@app/users/exceptions/incorrect-user-pasword.exeption';
+import { AccessDeniedException } from '../exceptions/access-denied.exeption';
+import { Status } from '@app/users/interfaces/users.enum';
+import { UserDeactivateException } from '@app/users/exceptions/user-deactivate.exeption';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +60,7 @@ export class AuthService {
             throw new RpcException(new UserSendMailErrorException(data.email));
         }
 
-        await this.usersService.updateByClientId(createdUser.clientId, { refreshToken: tokens.refreshToken });
+        await this.updateRefreshToken(createdUser.clientId, tokens.refreshToken);
 
         return { message: USER_CREATE_SUCCESS };
     }
@@ -55,14 +72,14 @@ export class AuthService {
             throw new RpcException(new UserVerifyProfileException());
         }
 
-        if (user.isValide) {
+        if (user.isEmailVerified) {
             this.log.error('verifyProfile attempt : user ' + user.email + ' already activated');
             throw new RpcException(new UserIsActiveException(user.email));
         }
 
         if (user.validationToken == data.token) {
             this.log.debug('verifyProfile : user ' + user.email + ' activated');
-            await this.usersService.updateByClientId(user.clientId, { isValide: true });
+            await this.usersService.updateByClientId(user.clientId, { isEmailVerified: true });
             return {
                 message: USRR_ACTIVATE_SUCCESS,
             };
@@ -103,7 +120,7 @@ export class AuthService {
             throw new RpcException(new UserNotExistsException());
         }
 
-        const hash = await argon2.hash(data.password);
+        const hash = await this.hashData(data.password);
 
         await this.usersService.updateByClientId(user.clientId, { password: hash });
 
@@ -112,5 +129,68 @@ export class AuthService {
         return {
             message: PASSWORD_UPDATE_SUCCESS,
         };
+    }
+
+    public async login(data: LoginUserRequest): Promise<LoginUserResponse> {
+        const user = await this.usersService.findUser({ email: data.email });
+
+        if (!user) {
+            throw new RpcException(new UserNotFoundException(data.email));
+        }
+
+        if (!user.isEmailVerified) {
+            throw new RpcException(new UserNotActiveException(user.email));
+        }
+
+        if (user.status != Status.active) {
+            throw new RpcException(new UserDeactivateException(user.email));
+        }
+
+        const passwordMatches = await argon2.verify(user.password, data.password);
+        if (!passwordMatches) {
+            throw new RpcException(new IncorrectUserPasswordException());
+        }
+
+        const tokens = await this.tokenService.getTokens(new JwtPayloadDataAdapter(user));
+
+        await this.updateRefreshToken(user.clientId, tokens.refreshToken);
+
+        return tokens;
+    }
+
+    public async logout(clientId: string): Promise<any> {
+        await this.usersService.updateByClientId(clientId, { refreshToken: null });
+        return 'User password was updated !';
+    }
+
+    public async refreshToken(data: RefreshToken) {
+        const user = await this.usersService.findUser({ clientId: data.clientId });
+
+        if (!user) {
+            throw new RpcException(new AccessDeniedException());
+        }
+
+        if (!user.refreshToken) return null;
+
+        const refreshTokenMatches = await argon2.verify(user.refreshToken, data.refreshToken);
+
+        if (!refreshTokenMatches) throw new AccessDeniedException();
+
+        const tokens = await this.tokenService.getTokens(new JwtPayloadDataAdapter(user));
+
+        await this.updateRefreshToken(data.clientId, tokens.refreshToken);
+
+        return tokens;
+    }
+
+    private async updateRefreshToken(clientId: string, refreshToken: string) {
+        const hashedRefreshToken = await this.hashData(refreshToken);
+        await this.usersService.updateByClientId(clientId, {
+            refreshToken: hashedRefreshToken,
+        });
+    }
+
+    private hashData(data: string) {
+        return argon2.hash(data);
     }
 }
