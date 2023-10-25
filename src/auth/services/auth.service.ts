@@ -10,7 +10,7 @@ import {
 } from '@app/users/exceptions';
 import { JwtPayloadDataAdapter } from '../adapters/jwt-payload-data.adapter';
 import { firstValueFrom } from 'rxjs';
-import { CONFIRM_UPDATE_PASSWORD, PASSWORD_UPDATE_SUCCESS, USER_CREATE_SUCCESS, USRR_ACTIVATE_SUCCESS } from '../auth.consts';
+import { CONFIRM_UPDATE_PASSWORD, PASSWORD_UPDATE_SUCCESS, USER_CREATE_SUCCESS, USRR_ACTIVATE_SUCCESS } from '../auth.constants';
 import { UsersService } from '@app/users/users.service';
 import { UserVerifyProfileException } from '@app/users/exceptions/user-verify-profile.exeption';
 import { UserIsActiveException } from '@app/users/exceptions/user-is-active.exeption';
