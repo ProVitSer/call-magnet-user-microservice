@@ -1,4 +1,4 @@
-import { Role, Status } from '@app/users/interfaces/users.enum';
+import { Role, Status } from '@app/platform-types/user/types';
 import { User } from '@app/users/schemas/users.schema';
 
 export class JwtPayloadDataAdapter {

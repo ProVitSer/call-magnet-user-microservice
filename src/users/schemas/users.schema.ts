@@ -1,6 +1,6 @@
+import { Role, Status } from '@app/platform-types/user/types';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Role, Status } from '../interfaces/users.enum';
 
 @Schema({
     collection: 'users',

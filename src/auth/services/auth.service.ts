@@ -19,7 +19,6 @@ import { UserNotExistsException } from '@app/users/exceptions/user-not-exist.exe
 import { v4 as uuidv4 } from 'uuid';
 import { IncorrectUserPasswordException } from '@app/users/exceptions/incorrect-user-pasword.exeption';
 import { AccessDeniedException } from '../exceptions/access-denied.exeption';
-import { Status } from '@app/users/interfaces/users.enum';
 import { UserDeactivateException } from '@app/users/exceptions/user-deactivate.exeption';
 import { ClientProxyProvide, MessagePatternCmd } from '@app/platform-types/client-proxy/types';
 import {
@@ -36,6 +35,7 @@ import {
     RefreshToken,
 } from '@app/platform-types/auth/interfaces';
 import { VerifyUserResponse } from '@app/platform-types/auth/types';
+import { Status } from '@app/platform-types/user/types';
 
 @Injectable()
 export class AuthService {
