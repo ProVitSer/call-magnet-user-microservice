@@ -13,6 +13,6 @@ async function bootstrap() {
         },
     });
 
-    app.listen().then(() => Logger.log('App start and listening on RabbitMQ'));
+    app.listen().then(() => Logger.log('User microservice start and listening on RabbitMQ'));
 }
 bootstrap();
