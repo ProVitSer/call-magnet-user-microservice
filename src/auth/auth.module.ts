@@ -5,9 +5,10 @@ import { TokenService } from './services/token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { UsersModule } from '@app/users/users.module';
+import { ClientProxyProvide } from '@app/platform-types/client-proxy/types';
 
 const clientProxyProvider: Provider = {
-    provide: 'MAIL_SERVICE',
+    provide: ClientProxyProvide.mail,
     useFactory: (): ClientProxy => {
         return ClientProxyFactory.create({
             transport: Transport.RMQ,

@@ -3,15 +3,6 @@ import { AppLoggerService } from '@app/app-logger/app-logger.service';
 import { TokenService } from './token.service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import {
-    LoginUserRequest,
-    LoginUserResponse,
-    RefreshToken,
-    RegisterUser,
-    ResetPassword,
-    UpdatePassword,
-    VerifyUser,
-} from '../interfaces/auth.interface';
-import {
     UserAlreadyExistsException,
     UserNotActiveException,
     UserNotFoundException,
@@ -30,17 +21,32 @@ import { IncorrectUserPasswordException } from '@app/users/exceptions/incorrect-
 import { AccessDeniedException } from '../exceptions/access-denied.exeption';
 import { Status } from '@app/users/interfaces/users.enum';
 import { UserDeactivateException } from '@app/users/exceptions/user-deactivate.exeption';
+import { ClientProxyProvide, MessagePatternCmd } from '@app/platform-types/client-proxy/types';
+import {
+    BaseResponse,
+    TokensResponse,
+    RegisterUserResponse,
+    ResetPasswordResponse,
+    LogoutResponse,
+    RegisterUser,
+    VerifyUser,
+    ResetPassword,
+    UpdatePassword,
+    LoginUser,
+    RefreshToken,
+} from '@app/platform-types/auth/interfaces';
+import { VerifyUserResponse } from '@app/platform-types/auth/types';
 
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject('MAIL_SERVICE') private readonly mailService: ClientProxy,
+        @Inject(ClientProxyProvide.mail) private readonly mailService: ClientProxy,
         private readonly log: AppLoggerService,
         private readonly tokenService: TokenService,
         private readonly usersService: UsersService,
     ) {}
 
-    public async register(data: RegisterUser): Promise<{ message: string }> {
+    public async register(data: RegisterUser): Promise<RegisterUserResponse> {
         const user = await this.usersService.findUser({ email: data.email });
 
         if (user) {
@@ -54,7 +60,7 @@ export class AuthService {
 
         try {
             await firstValueFrom(
-                this.mailService.send({ cmd: 'confirmation-email' }, { email: data.email, token: createdUser.validationToken }),
+                this.mailService.send({ cmd: MessagePatternCmd.confEmail }, { email: data.email, token: createdUser.validationToken }),
             );
         } catch (e) {
             throw new RpcException(new UserSendMailErrorException(data.email));
@@ -62,10 +68,14 @@ export class AuthService {
 
         await this.updateRefreshToken(createdUser.clientId, tokens.refreshToken);
 
-        return { message: USER_CREATE_SUCCESS };
+        return {
+            clientId: createdUser.clientId,
+            email: createdUser.email,
+            message: USER_CREATE_SUCCESS,
+        };
     }
 
-    public async verifyUser(data: VerifyUser): Promise<{ message: string }> {
+    public async verifyUser(data: VerifyUser): Promise<VerifyUserResponse> {
         const user = await this.usersService.findUser({ validationToken: data.token });
         if (!user) {
             this.log.error('verifyProfile attempt : user not found/token wrong');
@@ -81,6 +91,8 @@ export class AuthService {
             this.log.debug('verifyProfile : user ' + user.email + ' activated');
             await this.usersService.updateByClientId(user.clientId, { isEmailVerified: true });
             return {
+                clientId: user.clientId,
+                email: user.email,
                 message: USRR_ACTIVATE_SUCCESS,
             };
         }
@@ -88,7 +100,7 @@ export class AuthService {
         throw new RpcException(new UserVerifyProfileException());
     }
 
-    public async resetPassword(data: ResetPassword): Promise<{ message: string }> {
+    public async resetPassword(data: ResetPassword): Promise<ResetPasswordResponse> {
         const user = await this.usersService.findUser({ email: data.email });
 
         if (!user) {
@@ -100,7 +112,9 @@ export class AuthService {
         await this.usersService.updateByClientId(user.clientId, { validationToken });
 
         try {
-            await firstValueFrom(this.mailService.send({ cmd: 'reset-password-email' }, { email: data.email, token: validationToken }));
+            await firstValueFrom(
+                this.mailService.send({ cmd: MessagePatternCmd.resetPasswordEmail }, { email: data.email, token: validationToken }),
+            );
         } catch (e) {
             this.log.error('resetPassword attempt : Bad request' + data.email);
 
@@ -109,11 +123,12 @@ export class AuthService {
 
         this.log.debug('resetPassword : mail sent for user ' + data.email);
         return {
+            email: data.email,
             message: CONFIRM_UPDATE_PASSWORD,
         };
     }
 
-    public async updatePassword(data: UpdatePassword): Promise<{ message: string }> {
+    public async updatePassword(data: UpdatePassword): Promise<BaseResponse> {
         const user = await this.usersService.findUser({ validationToken: data.token });
         if (!user) {
             this.log.error('updatePassword: user does not exist');
@@ -124,14 +139,14 @@ export class AuthService {
 
         await this.usersService.updateByClientId(user.clientId, { password: hash });
 
-        this.log.debug('updatePassword : user ID ' + user._id + ' updated password');
+        this.log.debug('updatePassword : user ID ' + user.clientId + ' updated password');
 
         return {
             message: PASSWORD_UPDATE_SUCCESS,
         };
     }
 
-    public async login(data: LoginUserRequest): Promise<LoginUserResponse> {
+    public async login(data: LoginUser): Promise<TokensResponse> {
         const user = await this.usersService.findUser({ email: data.email });
 
         if (!user) {
@@ -158,12 +173,12 @@ export class AuthService {
         return tokens;
     }
 
-    public async logout(clientId: string): Promise<any> {
+    public async logout(clientId: string): Promise<LogoutResponse> {
         await this.usersService.updateByClientId(clientId, { refreshToken: null });
-        return 'User password was updated !';
+        return { result: true };
     }
 
-    public async refreshToken(data: RefreshToken) {
+    public async refreshToken(data: RefreshToken): Promise<TokensResponse> {
         const user = await this.usersService.findUser({ clientId: data.clientId });
 
         if (!user) {
@@ -183,14 +198,14 @@ export class AuthService {
         return tokens;
     }
 
-    private async updateRefreshToken(clientId: string, refreshToken: string) {
+    private async updateRefreshToken(clientId: string, refreshToken: string): Promise<void> {
         const hashedRefreshToken = await this.hashData(refreshToken);
         await this.usersService.updateByClientId(clientId, {
             refreshToken: hashedRefreshToken,
         });
     }
 
-    private hashData(data: string) {
+    private hashData(data: string): Promise<string> {
         return argon2.hash(data);
     }
 }
