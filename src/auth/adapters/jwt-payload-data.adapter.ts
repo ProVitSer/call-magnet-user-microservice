@@ -6,14 +6,14 @@ export class JwtPayloadDataAdapter {
     public firstname: string;
     public lastname: string;
     public email: string;
-    public roles: Role[];
+    public role: Role;
     public profileStatus: Status;
     constructor(public user: User) {
         this.clientId = user.clientId;
         this.firstname = user.firstname;
         this.lastname = user.lastname;
         this.email = user.email;
-        this.roles = user.roles;
+        this.role = user.role;
         this.profileStatus = user.status;
     }
 }
