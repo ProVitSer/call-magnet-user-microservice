@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UsersService } from './services/users.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MessagePatternCmd } from '@app/platform-types/client-proxy/types';
 import { FIND_USER_BY_ID_PROJ } from './users.constants';
