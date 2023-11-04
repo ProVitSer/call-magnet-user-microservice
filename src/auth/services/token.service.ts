@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { GetTokensResult } from '../interfaces/auth.interface';
-import { JwtPayloadDataAdapter } from '../adapters/jwt-payload-data.adapter';
-import * as moment from 'moment';
+// import * as moment from 'moment';
 import { DataObject } from '@app/platform-types/common/interfaces';
 
 @Injectable()
 export class TokenService {
     constructor(private jwtService: JwtService) {}
 
-    public async getTokens(data: JwtPayloadDataAdapter): Promise<GetTokensResult> {
+    public async getTokens(clientId: string): Promise<GetTokensResult> {
         return {
-            accessToken: await this.getToken({ sub: data.clientId, role: data.role }, process.env.JWT_AT_SECRET, process.env.JWT_AT_EXP),
-            refreshToken: await this.getToken({ sub: data.clientId }, process.env.JWT_RT_SECRET, process.env.JWT_RT_EXP),
-            accessTokenExpires: moment().add(600, 'minutes').unix(),
+            ...(await this.getAccessToken(clientId)),
+            refreshToken: await this.getToken({ sub: clientId }, process.env.JWT_RT_SECRET, process.env.JWT_RT_EXP),
+            //accessTokenExpires: moment().add(600, 'minutes').unix(),
+        };
+    }
+
+    public async getAccessToken(clientId: string) {
+        return {
+            accessToken: await this.getToken({ sub: clientId }, process.env.JWT_AT_SECRET, process.env.JWT_AT_EXP),
         };
     }
 
