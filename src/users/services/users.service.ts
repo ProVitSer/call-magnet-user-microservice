@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from './schemas/users.schema';
+import { User } from '../schemas/users.schema';
 import { AppLoggerService } from '@app/app-logger/app-logger.service';
-import { AddUser } from './interfaces/users.interface';
-import { UserModelAdapter } from './adapters/user-model.adapter';
+import { AddUser } from '../interfaces/users.interface';
+import { UserModelAdapter } from '../adapters/user-model.adapter';
+import { Menu } from '@app/platform-types/user/interfaces';
+import { Role } from '@app/platform-types/user/types';
+import { BASE_ROLE_MENU, STATIC_MENU_BY_ROLE } from '../users.constants';
 
 @Injectable()
 export class UsersService {
@@ -24,5 +27,14 @@ export class UsersService {
     }
     public async updateByClientId(clientId: string, fields: object) {
         return await this.userModel.findOneAndUpdate({ clientId }, { $set: { ...fields } });
+    }
+
+    public getUserMenuByRoles(roles: Role[]): Menu[] {
+        const menu: Menu[] = [...BASE_ROLE_MENU];
+        for (const role of roles) {
+            menu.push(...STATIC_MENU_BY_ROLE[role]);
+        }
+
+        return menu;
     }
 }

@@ -11,9 +11,10 @@ import {
     RegisterUserResponse,
     ResetPassword,
     ResetPasswordResponse,
-    TokensResponse,
+    LoginResponse,
     UpdatePassword,
     VerifyUser,
+    RefreshTokenResponse,
 } from '@app/platform-types/auth/interfaces';
 import { VerifyUserResponse } from '@app/platform-types/auth/types';
 
@@ -42,7 +43,7 @@ export class AuthController {
     }
 
     @MessagePattern({ cmd: MessagePatternCmd.login })
-    async login(@Payload() data: LoginUser): Promise<TokensResponse> {
+    async login(@Payload() data: LoginUser): Promise<LoginResponse> {
         return await this.authService.login(data);
     }
 
@@ -52,7 +53,7 @@ export class AuthController {
     }
 
     @MessagePattern({ cmd: MessagePatternCmd.refreshToken })
-    async refreshToken(@Payload() data: RefreshToken): Promise<TokensResponse> {
+    async refreshToken(@Payload() data: RefreshToken): Promise<RefreshTokenResponse> {
         return await this.authService.refreshToken(data);
     }
 }

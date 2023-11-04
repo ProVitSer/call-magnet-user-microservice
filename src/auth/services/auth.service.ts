@@ -8,10 +8,8 @@ import {
     UserNotFoundException,
     UserSendMailErrorException,
 } from '@app/users/exceptions';
-import { JwtPayloadDataAdapter } from '../adapters/jwt-payload-data.adapter';
 import { firstValueFrom } from 'rxjs';
 import { CONFIRM_UPDATE_PASSWORD, PASSWORD_UPDATE_SUCCESS, USER_CREATE_SUCCESS, USRR_ACTIVATE_SUCCESS } from '../auth.constants';
-import { UsersService } from '@app/users/users.service';
 import { UserVerifyProfileException } from '@app/users/exceptions/user-verify-profile.exeption';
 import { UserIsActiveException } from '@app/users/exceptions/user-is-active.exeption';
 import * as argon2 from 'argon2';
@@ -23,7 +21,7 @@ import { UserDeactivateException } from '@app/users/exceptions/user-deactivate.e
 import { ClientProxyProvide, MessagePatternCmd } from '@app/platform-types/client-proxy/types';
 import {
     BaseResponse,
-    TokensResponse,
+    LoginResponse,
     RegisterUserResponse,
     ResetPasswordResponse,
     LogoutResponse,
@@ -33,9 +31,11 @@ import {
     UpdatePassword,
     LoginUser,
     RefreshToken,
+    RefreshTokenResponse,
 } from '@app/platform-types/auth/interfaces';
 import { VerifyUserResponse } from '@app/platform-types/auth/types';
 import { Status } from '@app/platform-types/user/types';
+import { UsersService } from '@app/users/services/users.service';
 
 @Injectable()
 export class AuthService {
@@ -56,7 +56,7 @@ export class AuthService {
 
         const createdUser = await this.usersService.addUser(data);
 
-        const tokens = await this.tokenService.getTokens(new JwtPayloadDataAdapter(createdUser));
+        const tokens = await this.tokenService.getTokens(createdUser.clientId);
 
         try {
             await firstValueFrom(
@@ -146,7 +146,7 @@ export class AuthService {
         };
     }
 
-    public async login(data: LoginUser): Promise<TokensResponse> {
+    public async login(data: LoginUser): Promise<LoginResponse> {
         const user = await this.usersService.findUser({ email: data.email });
 
         if (!user) {
@@ -166,11 +166,11 @@ export class AuthService {
             throw new RpcException(new IncorrectUserPasswordException());
         }
 
-        const tokens = await this.tokenService.getTokens(new JwtPayloadDataAdapter(user));
+        const tokens = await this.tokenService.getTokens(user.clientId);
 
         await this.updateRefreshToken(user.clientId, tokens.refreshToken);
 
-        return tokens;
+        return { ...tokens, userRoles: user.roles, menu: this.usersService.getUserMenuByRoles(user.roles) };
     }
 
     public async logout(clientId: string): Promise<LogoutResponse> {
@@ -178,7 +178,7 @@ export class AuthService {
         return { result: true };
     }
 
-    public async refreshToken(data: RefreshToken): Promise<TokensResponse> {
+    public async refreshToken(data: RefreshToken): Promise<RefreshTokenResponse> {
         const user = await this.usersService.findUser({ clientId: data.clientId });
 
         if (!user) {
@@ -191,11 +191,9 @@ export class AuthService {
 
         if (!refreshTokenMatches) throw new AccessDeniedException();
 
-        const tokens = await this.tokenService.getTokens(new JwtPayloadDataAdapter(user));
+        const token = await this.tokenService.getAccessToken(user.clientId);
 
-        await this.updateRefreshToken(data.clientId, tokens.refreshToken);
-
-        return tokens;
+        return { ...token };
     }
 
     private async updateRefreshToken(clientId: string, refreshToken: string): Promise<void> {
