@@ -9,12 +9,14 @@ import {
     RefreshToken,
     RegisterUser,
     RegisterUserResponse,
-    ResetPassword,
-    ResetPasswordResponse,
     LoginResponse,
-    UpdatePassword,
+    ResetPassword,
     VerifyUser,
     RefreshTokenResponse,
+    VerificationCode,
+    VerificationCodeResponse,
+    ForgotPasswordData,
+    ForgotPasswordResponse,
 } from '@app/platform-types/auth/interfaces';
 import { VerifyUserResponse } from '@app/platform-types/auth/types';
 
@@ -32,14 +34,14 @@ export class AuthController {
         return await this.authService.verifyUser(data);
     }
 
-    @MessagePattern({ cmd: MessagePatternCmd.resetPassword })
-    async resetPasword(@Payload() data: ResetPassword): Promise<ResetPasswordResponse> {
-        return await this.authService.resetPassword(data);
+    @MessagePattern({ cmd: MessagePatternCmd.forgotPassword })
+    async forgotPassword(@Payload() data: ForgotPasswordData): Promise<ForgotPasswordResponse> {
+        return await this.authService.forgotPassword(data);
     }
 
-    @MessagePattern({ cmd: MessagePatternCmd.updatePassword })
-    async updatePassword(@Payload() data: UpdatePassword): Promise<BaseResponse> {
-        return await this.authService.updatePassword(data);
+    @MessagePattern({ cmd: MessagePatternCmd.resetPassword })
+    async resetPassword(@Payload() data: ResetPassword): Promise<BaseResponse> {
+        return await this.authService.resetPassword(data);
     }
 
     @MessagePattern({ cmd: MessagePatternCmd.login })
@@ -55,5 +57,10 @@ export class AuthController {
     @MessagePattern({ cmd: MessagePatternCmd.refreshToken })
     async refreshToken(@Payload() data: RefreshToken): Promise<RefreshTokenResponse> {
         return await this.authService.refreshToken(data);
+    }
+
+    @MessagePattern({ cmd: MessagePatternCmd.verifyCode })
+    async verifyCode(@Payload() data: VerificationCode): Promise<VerificationCodeResponse> {
+        return await this.authService.verifyCode(data);
     }
 }

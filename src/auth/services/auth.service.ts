@@ -23,15 +23,17 @@ import {
     BaseResponse,
     LoginResponse,
     RegisterUserResponse,
-    ResetPasswordResponse,
     LogoutResponse,
     RegisterUser,
     VerifyUser,
-    ResetPassword,
-    UpdatePassword,
     LoginUser,
     RefreshToken,
     RefreshTokenResponse,
+    VerificationCodeResponse,
+    VerificationCode,
+    ForgotPasswordData,
+    ForgotPasswordResponse,
+    ResetPassword,
 } from '@app/platform-types/auth/interfaces';
 import { VerifyUserResponse } from '@app/platform-types/auth/types';
 import { Status } from '@app/platform-types/user/types';
@@ -89,7 +91,7 @@ export class AuthService {
 
         if (user.validationToken == data.token) {
             this.log.debug('verifyProfile : user ' + user.email + ' activated');
-            await this.usersService.updateByClientId(user.clientId, { isEmailVerified: true });
+            await this.usersService.updateByClientId(user.clientId, { isEmailVerified: true, validationToken: null });
             return {
                 clientId: user.clientId,
                 email: user.email,
@@ -100,7 +102,7 @@ export class AuthService {
         throw new RpcException(new UserVerifyProfileException());
     }
 
-    public async resetPassword(data: ResetPassword): Promise<ResetPasswordResponse> {
+    public async forgotPassword(data: ForgotPasswordData): Promise<ForgotPasswordResponse> {
         const user = await this.usersService.findUser({ email: data.email });
 
         if (!user) {
@@ -123,13 +125,12 @@ export class AuthService {
 
         this.log.debug('resetPassword : mail sent for user ' + data.email);
         return {
-            email: data.email,
             message: CONFIRM_UPDATE_PASSWORD,
         };
     }
 
-    public async updatePassword(data: UpdatePassword): Promise<BaseResponse> {
-        const user = await this.usersService.findUser({ validationToken: data.token });
+    public async resetPassword(data: ResetPassword): Promise<BaseResponse> {
+        const user = await this.usersService.findUser({ validationToken: data.verificationCode });
         if (!user) {
             this.log.error('updatePassword: user does not exist');
             throw new RpcException(new UserNotExistsException());
@@ -137,7 +138,7 @@ export class AuthService {
 
         const hash = await this.hashData(data.password);
 
-        await this.usersService.updateByClientId(user.clientId, { password: hash });
+        await this.usersService.updateByClientId(user.clientId, { password: hash, validationToken: null });
 
         this.log.debug('updatePassword : user ID ' + user.clientId + ' updated password');
 
@@ -205,5 +206,10 @@ export class AuthService {
 
     private hashData(data: string): Promise<string> {
         return argon2.hash(data);
+    }
+
+    public async verifyCode(data: VerificationCode): Promise<VerificationCodeResponse> {
+        const user = await this.usersService.findUser({ validationToken: data.code });
+        return { isValid: !!user };
     }
 }
