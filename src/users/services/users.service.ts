@@ -5,9 +5,22 @@ import { User } from '../schemas/users.schema';
 import { AppLoggerService } from '@app/app-logger/app-logger.service';
 import { AddUser } from '../interfaces/users.interface';
 import { UserModelAdapter } from '../adapters/user-model.adapter';
-import { FindUserByClientIdResponse, GetClientInfoResponse, Menu } from '@app/platform-types/user/interfaces';
+import {
+    FindUserByClientIdResponse,
+    GetClientInfoResponse,
+    Menu,
+    UpdateClientInfoData,
+    UpdateClientInfoResponse,
+} from '@app/platform-types/user/interfaces';
 import { Role } from '@app/platform-types/user/types';
-import { BASE_ROLE_MENU, STATIC_MENU_BY_ROLE, FIND_USER_BY_ID_PROJ, GET_CLIENT_INFO_PROJ } from '../users.constants';
+import {
+    BASE_ROLE_MENU,
+    STATIC_MENU_BY_ROLE,
+    FIND_USER_BY_ID_PROJ,
+    GET_CLIENT_INFO_PROJ,
+    UPDATE_CLIENT_SUCCESS,
+    UPDATE_CLIENT_ERROR,
+} from '../users.constants';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +33,10 @@ export class UsersService {
 
         return await createdUser.save();
     }
+
     public async updateByClientId(clientId: string, fields: object) {
+        this.log.log('update' + clientId + 'info ' + fields);
+
         return await this.userModel.findOneAndUpdate({ clientId }, { $set: { ...fields } });
     }
 
@@ -44,5 +60,17 @@ export class UsersService {
     public async findUser(filter: object, projection?: { [key: string]: number }): Promise<User> {
         const user: User = await this.userModel.findOne({ ...filter }, projection).exec();
         return user;
+    }
+
+    public async updateClientInfo(data: UpdateClientInfoData): Promise<UpdateClientInfoResponse> {
+        try {
+            const { clientId, ...clientInfo } = data;
+
+            await this.updateByClientId(clientId, clientInfo);
+
+            return { result: true, message: UPDATE_CLIENT_SUCCESS };
+        } catch (e) {
+            return { result: false, message: UPDATE_CLIENT_ERROR };
+        }
     }
 }
