@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { GetTokensResult } from '../interfaces/auth.interface';
-// import * as moment from 'moment';
 import { DataObject } from '@app/platform-types/common/interfaces';
 
 @Injectable()
@@ -12,7 +11,6 @@ export class TokenService {
         return {
             ...(await this.getAccessToken(clientId)),
             refreshToken: await this.getToken({ sub: clientId }, process.env.JWT_RT_SECRET, process.env.JWT_RT_EXP),
-            //accessTokenExpires: moment().add(600, 'minutes').unix(),
         };
     }
 
