@@ -2,8 +2,7 @@ import { Controller } from '@nestjs/common';
 import { UsersService } from './services/users.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MessagePatternCmd } from '@app/platform-types/client-proxy/types';
-import { FIND_USER_BY_ID_PROJ } from './users.constants';
-import { FindUserByClientIdResponse } from '@app/platform-types/user/interfaces';
+import { FindUserByClientIdResponse, GetClientInfoResponse } from '@app/platform-types/user/interfaces';
 
 @Controller('users')
 export class UsersController {
@@ -11,6 +10,11 @@ export class UsersController {
 
     @MessagePattern({ cmd: MessagePatternCmd.findUserByClientId })
     async findUserByClientId(@Payload() clientId: string): Promise<FindUserByClientIdResponse> {
-        return await this.usersService.findUser({ clientId }, FIND_USER_BY_ID_PROJ);
+        return await this.usersService.findUserByClientId(clientId);
+    }
+
+    @MessagePattern({ cmd: MessagePatternCmd.getClientInfo })
+    async getClientInfo(@Payload() clientId: string): Promise<GetClientInfoResponse> {
+        return await this.usersService.getClientInfo(clientId);
     }
 }

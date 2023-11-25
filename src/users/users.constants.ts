@@ -6,6 +6,7 @@ export const USER_NOT_EXIST = 'Пользователь не существуе�
 export const USER_NOT_ACTIVE = 'Пользователь не активен';
 export const INCORRECT_PASSWORD = 'Введен некорректный пароль';
 export const FIND_USER_BY_ID_PROJ = { _id: 1, refreshToken: 1, validationToken: 1, isEmailVerified: 1 };
+export const GET_CLIENT_INFO_PROJ = { _id: 0, firstname: 1, lastname: 1, email: 1, phoneNumber: 1, company: 1, status: 1, roles: 1 };
 
 export const BASE_ROLE_MENU: Menu[] = [
     {

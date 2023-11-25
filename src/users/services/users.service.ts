@@ -5,18 +5,13 @@ import { User } from '../schemas/users.schema';
 import { AppLoggerService } from '@app/app-logger/app-logger.service';
 import { AddUser } from '../interfaces/users.interface';
 import { UserModelAdapter } from '../adapters/user-model.adapter';
-import { Menu } from '@app/platform-types/user/interfaces';
+import { FindUserByClientIdResponse, GetClientInfoResponse, Menu } from '@app/platform-types/user/interfaces';
 import { Role } from '@app/platform-types/user/types';
-import { BASE_ROLE_MENU, STATIC_MENU_BY_ROLE } from '../users.constants';
+import { BASE_ROLE_MENU, STATIC_MENU_BY_ROLE, FIND_USER_BY_ID_PROJ, GET_CLIENT_INFO_PROJ } from '../users.constants';
 
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User.name) readonly userModel: Model<User>, private readonly log: AppLoggerService) {}
-
-    async findUser(filter: object, projection?: { [key: string]: number }): Promise<User> {
-        const user: User = await this.userModel.findOne({ ...filter }, projection).exec();
-        return user;
-    }
 
     public async addUser(data: AddUser): Promise<User> {
         const createdUser = new this.userModel((await UserModelAdapter.factory(data)).userData);
@@ -36,5 +31,18 @@ export class UsersService {
         }
 
         return menu;
+    }
+
+    public async getClientInfo(clientId: string): Promise<GetClientInfoResponse> {
+        return await this.findUser({ clientId }, GET_CLIENT_INFO_PROJ);
+    }
+
+    public async findUserByClientId(clientId: string): Promise<FindUserByClientIdResponse> {
+        return await this.findUser({ clientId }, FIND_USER_BY_ID_PROJ);
+    }
+
+    public async findUser(filter: object, projection?: { [key: string]: number }): Promise<User> {
+        const user: User = await this.userModel.findOne({ ...filter }, projection).exec();
+        return user;
     }
 }
