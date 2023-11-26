@@ -12,7 +12,6 @@ import { firstValueFrom } from 'rxjs';
 import { CONFIRM_UPDATE_PASSWORD, PASSWORD_UPDATE_SUCCESS, USER_CREATE_SUCCESS, USRR_ACTIVATE_SUCCESS } from '../auth.constants';
 import { UserVerifyProfileException } from '@app/users/exceptions/user-verify-profile.exeption';
 import { UserIsActiveException } from '@app/users/exceptions/user-is-active.exeption';
-import * as argon2 from 'argon2';
 import { UserNotExistsException } from '@app/users/exceptions/user-not-exist.exeption';
 import { v4 as uuidv4 } from 'uuid';
 import { IncorrectUserPasswordException } from '@app/users/exceptions/incorrect-user-pasword.exeption';
@@ -38,6 +37,7 @@ import {
 import { VerifyUserResponse } from '@app/platform-types/auth/types';
 import { Status } from '@app/platform-types/user/types';
 import { UsersService } from '@app/users/services/users.service';
+import { ArgonUtilService } from '@app/utils/argon.service';
 
 @Injectable()
 export class AuthService {
@@ -136,7 +136,7 @@ export class AuthService {
             throw new RpcException(new UserNotExistsException());
         }
 
-        const hash = await this.hashData(data.password);
+        const hash = await ArgonUtilService.hashData(data.password);
 
         await this.usersService.updateByClientId(user.clientId, { password: hash, validationToken: null });
 
@@ -162,7 +162,7 @@ export class AuthService {
             throw new RpcException(new UserDeactivateException(user.email));
         }
 
-        const passwordMatches = await argon2.verify(user.password, data.password);
+        const passwordMatches = await ArgonUtilService.verify(user.password, data.password);
         if (!passwordMatches) {
             throw new RpcException(new IncorrectUserPasswordException());
         }
@@ -188,7 +188,7 @@ export class AuthService {
 
         if (!user.refreshToken) return null;
 
-        const refreshTokenMatches = await argon2.verify(user.refreshToken, data.refreshToken);
+        const refreshTokenMatches = await ArgonUtilService.verify(user.refreshToken, data.refreshToken);
 
         if (!refreshTokenMatches) throw new AccessDeniedException();
 
@@ -198,14 +198,10 @@ export class AuthService {
     }
 
     private async updateRefreshToken(clientId: string, refreshToken: string): Promise<void> {
-        const hashedRefreshToken = await this.hashData(refreshToken);
+        const hashedRefreshToken = await ArgonUtilService.hashData(refreshToken);
         await this.usersService.updateByClientId(clientId, {
             refreshToken: hashedRefreshToken,
         });
-    }
-
-    private hashData(data: string): Promise<string> {
-        return argon2.hash(data);
     }
 
     public async verifyCode(data: VerificationCode): Promise<VerificationCodeResponse> {
