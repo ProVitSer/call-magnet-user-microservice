@@ -3,6 +3,8 @@ import { UsersService } from './services/users.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MessagePatternCmd } from '@app/platform-types/client-proxy/types';
 import {
+    ChangePasswordData,
+    ChangePasswordResponse,
     FindUserByClientIdResponse,
     GetClientInfoResponse,
     UpdateClientInfoData,
@@ -26,5 +28,10 @@ export class UsersController {
     @MessagePattern({ cmd: MessagePatternCmd.updateClientInfo })
     async updateClientInfo(@Payload() data: UpdateClientInfoData): Promise<UpdateClientInfoResponse> {
         return await this.usersService.updateClientInfo(data);
+    }
+
+    @MessagePattern({ cmd: MessagePatternCmd.changePassword })
+    async changePassword(@Payload() data: ChangePasswordData): Promise<ChangePasswordResponse> {
+        return await this.usersService.changePassword(data);
     }
 }

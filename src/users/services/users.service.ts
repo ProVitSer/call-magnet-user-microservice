@@ -6,6 +6,7 @@ import { AppLoggerService } from '@app/app-logger/app-logger.service';
 import { AddUser } from '../interfaces/users.interface';
 import { UserModelAdapter } from '../adapters/user-model.adapter';
 import {
+    ChangePasswordData,
     FindUserByClientIdResponse,
     GetClientInfoResponse,
     Menu,
@@ -20,7 +21,11 @@ import {
     GET_CLIENT_INFO_PROJ,
     UPDATE_CLIENT_SUCCESS,
     UPDATE_CLIENT_ERROR,
+    PASSWORD_UPDATE_SUCCESS,
 } from '../users.constants';
+import { RpcException } from '@nestjs/microservices';
+import { UserNotFoundException, IncorrectOldPasswordException } from '../exceptions';
+import { ArgonUtilService } from '@app/utils/argon.service';
 
 @Injectable()
 export class UsersService {
@@ -72,5 +77,30 @@ export class UsersService {
         } catch (e) {
             return { result: false, message: UPDATE_CLIENT_ERROR };
         }
+    }
+
+    public async changePassword(data: ChangePasswordData) {
+        const { clientId, oldPassword, newPassword } = data;
+
+        const user = await this.findUser({ clientId });
+
+        if (!user) {
+            throw new RpcException(new UserNotFoundException(clientId));
+        }
+
+        const passwordMatches = await ArgonUtilService.verify(user.password, oldPassword);
+        if (!passwordMatches) {
+            throw new RpcException(new IncorrectOldPasswordException());
+        }
+
+        const hash = await ArgonUtilService.hashData(newPassword);
+
+        await this.updateByClientId(user.clientId, { password: hash });
+
+        this.log.debug('updatePassword : user ID ' + user.clientId + ' updated password');
+
+        return {
+            message: PASSWORD_UPDATE_SUCCESS,
+        };
     }
 }

@@ -9,6 +9,7 @@ export const FIND_USER_BY_ID_PROJ = { _id: 1, refreshToken: 1, validationToken: 
 export const GET_CLIENT_INFO_PROJ = { _id: 0, firstname: 1, lastname: 1, email: 1, phoneNumber: 1, company: 1, status: 1, roles: 1 };
 export const UPDATE_CLIENT_SUCCESS = 'Даннйе успешно обновлены';
 export const UPDATE_CLIENT_ERROR = 'Ошибка обновления данных';
+export const PASSWORD_UPDATE_SUCCESS = 'Пароль успешно обновлен';
 
 export const BASE_ROLE_MENU: Menu[] = [
     {
