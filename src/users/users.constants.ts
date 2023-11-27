@@ -13,6 +13,7 @@ export const PASSWORD_UPDATE_SUCCESS = 'Пароль успешно обновл
 
 export const BASE_ROLE_MENU: Menu[] = [
     {
+        code: 1,
         name: 'Рабочий стол',
         path: '/sm/dashboard',
         icon: 'ft-monitor',
@@ -22,18 +23,35 @@ export const BASE_ROLE_MENU: Menu[] = [
         group: { lines: [] },
     },
     {
-        name: 'Аналитика',
-        path: '/sm/analitic',
-        icon: 'ft-bar-chart-2',
+        code: 8,
+        name: 'Поддержка',
+        path: 'https://icep.omnidesk.ru/',
+        icon: 'ft-life-buoy',
         badge: '',
+        badgeClass: '',
+        externalLink: true,
+        group: { lines: [] },
+    },
+];
+
+export const ANALITIC_MENU: Menu[] = [
+    {
+        code: 2,
+        path: '/sm/analitic',
+        name: 'Аналитика',
+        icon: 'ft-bar-chart-2',
+        //badge: 'Новое',
+        badge: '',
+        // badgeClass: 'badge badge-pill badge-primary float-right mr-1 mt-1',
         badgeClass: '',
         externalLink: false,
         group: { lines: [] },
     },
 ];
 
-export const SM_MENU: Menu[] = [
+export const CRM_MENU: Menu[] = [
     {
+        code: 3,
         name: 'CRM',
         path: '',
         icon: 'ft-layout',
@@ -43,6 +61,7 @@ export const SM_MENU: Menu[] = [
         group: {
             lines: [
                 {
+                    code: 1,
                     name: 'Настройки',
                     path: '/sm/crm/settings',
                     icon: 'ft-settings',
@@ -56,33 +75,182 @@ export const SM_MENU: Menu[] = [
     },
 ];
 
-export const PRO_MENU: Menu[] = [];
+export const API_MENU: Menu[] = [
+    {
+        code: 4,
+        path: '/sm/api',
+        name: '3CX API',
+        icon: 'ft-repeat',
+        badge: 'Новое',
+        badgeClass: 'badge badge-pill badge-primary float-right mr-1 mt-1',
+        externalLink: false,
+        group: { lines: [] },
+    },
+];
+
+export const AUTO_DIAL_MENU: Menu[] = [
+    {
+        code: 5,
+        name: 'Автообзвон',
+        path: '',
+        icon: 'ft-phone-outgoing',
+        badge: '',
+        badgeClass: '',
+        externalLink: false,
+        group: {
+            lines: [
+                {
+                    code: 1,
+                    name: 'Создать',
+                    path: '/sm/auto-dial/create',
+                    icon: 'icon-note',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 2,
+                    name: 'Задания на обзвон',
+                    path: '/sm/auto-dial/tasks',
+                    icon: 'icon-shuffle',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 3,
+                    name: 'Отчеты',
+                    path: '/sm/auto-dial/reports',
+                    icon: 'ft-file-text',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 4,
+                    name: 'Настройки',
+                    path: '/sm/auto-dial/settings',
+                    icon: 'ft-settings',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+            ],
+        },
+    },
+];
+
+export const SMS_MENU: Menu[] = [
+    {
+        code: 6,
+        name: 'SMS',
+        path: '',
+        icon: 'icon-speech',
+        badge: '',
+        badgeClass: '',
+        externalLink: false,
+        group: {
+            lines: [
+                {
+                    code: 1,
+                    name: 'Создать',
+                    path: '/sm/sms/send',
+                    icon: 'icon-share-alt',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 2,
+                    name: 'Массовая рассылка',
+                    path: '/sm/sms/mass-sending',
+                    icon: 'icon-users',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 3,
+                    name: 'Неотвеченные вызовы',
+                    path: '/sm/sms/no-answer-call-sending',
+                    icon: 'icon-call-end',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 4,
+                    name: 'Статистика',
+                    path: '/sm/sms/statistic',
+                    icon: 'ft-align-left',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 5,
+                    name: 'Настройки',
+                    path: '/sm/sms/settings',
+                    icon: 'ft-settings',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+            ],
+        },
+    },
+];
+
+export const TELEGRAM_MENU: Menu[] = [
+    {
+        code: 7,
+        name: 'Telegram',
+        path: '',
+        icon: 'icon-paper-plane',
+        badge: '',
+        badgeClass: '',
+        externalLink: false,
+        group: {
+            lines: [
+                {
+                    code: 1,
+                    name: 'Неотвеченные вызовы',
+                    path: '/sm/telegram/no-answer-call',
+                    icon: 'icon-call-end',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 2,
+                    name: 'Неотвеченные вызовы',
+                    path: '/sm/telegram/call',
+                    icon: 'icon-call-out',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+            ],
+        },
+    },
+];
 
 export const STATIC_MENU_BY_ROLE: { [role in Role]: Menu[] } = {
-    [Role.SM]: SM_MENU,
-    [Role.PRO]: PRO_MENU,
+    [Role.api]: API_MENU,
+    [Role.analitic]: ANALITIC_MENU,
+    [Role.crm]: CRM_MENU,
+    [Role.autoDial]: AUTO_DIAL_MENU,
+    [Role.sms]: SMS_MENU,
+    [Role.telegram]: TELEGRAM_MENU,
 };
-
-// export const ROUTES: RouteInfo[] = [
-
-//     { path: '/sm/api', title: '3CX API', icon: 'ft-repeat', class: '', badge: 'Новое', badgeClass: 'badge badge-pill badge-primary float-right mr-1 mt-1', isExternalLink: false, submenu: [] },
-//     { path: '', title: 'Автообзвон', icon: 'ft-phone-outgoing', class: 'has-sub', badge: '', badgeClass: '', isExternalLink: false, submenu: [
-//       { path: '/sm/auto-dial/create', title: 'Создать', icon: 'icon-note', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/auto-dial/tasks', title: 'Задания на обзвон', icon: 'icon-shuffle', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/auto-dial/reports', title: 'Отчеты', icon: 'ft-file-text', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/auto-dial/settings', title: 'Настройки', icon: 'ft-settings', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//     ] },
-//     { path: '', title: 'SMS', icon: 'icon-speech', class: 'has-sub', badge: '', badgeClass: '', isExternalLink: false, submenu: [
-//       { path: '/sm/sms/send', title: 'Отправка', icon: 'icon-share-alt', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/sms/mass-sending', title: 'Массовая рассылка', icon: 'icon-users', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/sms/no-answer-call-sending', title: 'Неотвеченные вызовы', icon: 'icon-call-end', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/sms/statistic', title: 'Статистика', icon: 'ft-align-left', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/sms/settings', title: 'Настройки', icon: 'ft-settings', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//     ] },
-//     { path: '', title: 'Telegram', icon: 'icon-paper-plane', class: 'has-sub', badge: '', badgeClass: '', isExternalLink: false, submenu: [
-//       { path: '/sm/telegram/no-answer-call', title: 'Неотвеченные вызовы', icon: 'icon-call-end', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-//       { path: '/sm/telegram/call', title: 'Звонки', icon: 'icon-call-out', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-
-//     ] },
-//     { path: 'https://icep.omnidesk.ru/', title: 'Поддержка', icon: 'ft-life-buoy', class: '', badge: '', badgeClass: '', isExternalLink: true, submenu: [] },
-//   ];

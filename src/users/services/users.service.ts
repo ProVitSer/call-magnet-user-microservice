@@ -52,8 +52,7 @@ export class UsersService {
         for (const role of roles) {
             menu.push(...STATIC_MENU_BY_ROLE[role]);
         }
-
-        return menu;
+        return menu.sort((a, b) => a.code - b.code);
     }
 
     public async getClientInfo(clientId: string): Promise<GetClientInfoResponse> {
