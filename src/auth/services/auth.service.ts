@@ -38,6 +38,7 @@ import { VerifyUserResponse } from '@app/platform-types/auth/types';
 import { Status } from '@app/platform-types/user/types';
 import { UsersService } from '@app/users/services/users.service';
 import { ArgonUtilService } from '@app/utils/argon.service';
+import { LoginResponseDataAdapter } from '../adapters/login-response-data.adapter';
 
 @Injectable()
 export class AuthService {
@@ -173,7 +174,7 @@ export class AuthService {
 
         await this.addLastLogin(user.clientId);
 
-        return { ...tokens, userRoles: user.roles, menu: this.usersService.getUserMenuByRoles(user.roles) };
+        return new LoginResponseDataAdapter(user, tokens, this.usersService);
     }
 
     public async logout(clientId: string): Promise<LogoutResponse> {
