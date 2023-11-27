@@ -6,6 +6,7 @@ export interface UserDataAdapter {
     password: string;
     clientId: string;
     validationToken: string;
+    registeredDate: string;
 }
 
 export interface AddUser {

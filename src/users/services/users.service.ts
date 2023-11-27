@@ -26,6 +26,7 @@ import {
 import { RpcException } from '@nestjs/microservices';
 import { UserNotFoundException, IncorrectOldPasswordException } from '../exceptions';
 import { ArgonUtilService } from '@app/utils/argon.service';
+import { AddLatestActivity } from '../decorators/add-latest-activity';
 
 @Injectable()
 export class UsersService {
@@ -39,6 +40,7 @@ export class UsersService {
         return await createdUser.save();
     }
 
+    @AddLatestActivity
     public async updateByClientId(clientId: string, fields: object) {
         this.log.log('update' + clientId + 'info ' + fields);
 

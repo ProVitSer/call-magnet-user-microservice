@@ -171,6 +171,8 @@ export class AuthService {
 
         await this.updateRefreshToken(user.clientId, tokens.refreshToken);
 
+        await this.addLastLogin(user.clientId);
+
         return { ...tokens, userRoles: user.roles, menu: this.usersService.getUserMenuByRoles(user.roles) };
     }
 
@@ -201,6 +203,12 @@ export class AuthService {
         const hashedRefreshToken = await ArgonUtilService.hashData(refreshToken);
         await this.usersService.updateByClientId(clientId, {
             refreshToken: hashedRefreshToken,
+        });
+    }
+
+    private async addLastLogin(clientId: string): Promise<void> {
+        await this.usersService.updateByClientId(clientId, {
+            lastLogin: new Date().toISOString(),
         });
     }
 

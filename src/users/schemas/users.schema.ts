@@ -42,6 +42,15 @@ export class User extends Document {
 
     @Prop({ default: '' })
     refreshToken: string;
+
+    @Prop()
+    registeredDate: string;
+
+    @Prop({ default: '' })
+    latestActivity: string;
+
+    @Prop({ default: '' })
+    lastLogin: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

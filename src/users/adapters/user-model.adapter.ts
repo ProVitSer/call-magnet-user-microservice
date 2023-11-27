@@ -15,6 +15,6 @@ export class UserModelAdapter {
         const password = await argon2.hash(createUser.password);
         const validationToken = uuidv4();
         delete createUser.password;
-        return new UserModelAdapter({ ...createUser, validationToken, clientId, password });
+        return new UserModelAdapter({ ...createUser, validationToken, clientId, password, registeredDate: new Date().toISOString() });
     }
 }
