@@ -37,7 +37,7 @@ export class User extends Document {
     @Prop({ default: '' })
     validationToken: string | null;
 
-    @Prop({ default: [Role.SM] })
+    @Prop({ default: [Role.analitic] })
     roles: Role[];
 
     @Prop({ default: '' })
