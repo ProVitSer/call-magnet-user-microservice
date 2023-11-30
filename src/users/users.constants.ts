@@ -24,6 +24,16 @@ export const BASE_ROLE_MENU: Menu[] = [
     },
     {
         code: 8,
+        name: 'FAQ',
+        path: '/sm/faq',
+        icon: 'icon-question',
+        badge: '',
+        badgeClass: '',
+        externalLink: false,
+        group: { lines: [] },
+    },
+    {
+        code: 9,
         name: 'Поддержка',
         path: 'https://icep.omnidesk.ru/',
         icon: 'ft-life-buoy',
