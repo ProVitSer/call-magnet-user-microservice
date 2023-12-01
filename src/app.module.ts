@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { AppLoggerModule } from './app-logger/app-logger.module';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
     imports: [
@@ -15,6 +16,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         AppLoggerModule,
         UsersModule,
         AuthModule,
+        NotificationModule,
     ],
     controllers: [],
     providers: [],
