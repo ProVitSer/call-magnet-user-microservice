@@ -24,7 +24,10 @@ export class Notification extends Document {
     avatarType: AvatarType;
 
     @Prop({ type: String })
-    avatar: string;
+    icon?: string;
+
+    @Prop({ type: String })
+    img?: string;
 
     @Prop({ type: String })
     title: string;

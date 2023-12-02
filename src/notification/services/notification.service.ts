@@ -1,40 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage, AggregateOptions, ProjectionType } from 'mongoose';
-import { Notification } from '../schemas/notification.schema';
-import { AddNotificationData } from '@app/platform-types/notification/interfaces';
-import { AppLoggerService } from '@app/app-logger/app-logger.service';
-import { NotificationModelDataAdapter } from '../adapters/notification-model-data.adapter';
+import { NotificationModelService } from './notification-model.service';
+import {
+    GetClientNotificationsData,
+    GetClientNotificationsReponse,
+    MarkNotificationsIsReadData,
+} from '@app/platform-types/notification/interfaces';
+import { PipelineStage } from 'mongoose';
+import { AddNotificationDto } from '../dto/add-notification.dto';
+import { ObjectId } from 'mongodb';
+import { NOTIFICATIONS_INFO_PROJ } from '../notification.constants';
 
 @Injectable()
 export class NotificationService {
-    constructor(@InjectModel(Notification.name) readonly notificationModel: Model<Notification>, private readonly log: AppLoggerService) {}
+    constructor(private readonly notificationModelService: NotificationModelService) {}
 
-    public async getNotificationById(id: string, projection?: ProjectionType<Notification>) {
-        return await this.notificationModel.findById(id, projection, { isDeleted: false });
+    public async getClientNotifications(data: GetClientNotificationsData): Promise<GetClientNotificationsReponse[]> {
+        const pipeline: PipelineStage[] = [
+            {
+                $addFields: {
+                    id: '$_id',
+                },
+            },
+            {
+                $match: { clientId: data.clientId, isDeleted: { $ne: true } },
+            },
+            {
+                $sort: { _id: 1 },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    clientId: 0,
+                    ...NOTIFICATIONS_INFO_PROJ,
+                },
+            },
+            {
+                $limit: Number(data.limit),
+            },
+        ];
+        return await this.notificationModelService.getAggregateNotification(pipeline);
     }
 
-    public async getAggregateNotification(pipeline: PipelineStage[], options?: AggregateOptions) {
-        return await this.notificationModel.aggregate(pipeline, options);
+    public async addNotification(data: AddNotificationDto) {
+        return await this.notificationModelService.addNotification(data);
     }
 
-    public async updateNotificationById(id: string, fields: object) {
-        return await this.notificationModel.findOneAndUpdate({ _id: id }, { $set: { ...fields } });
-    }
+    public async markNotificationsIsRead(data: MarkNotificationsIsReadData) {
+        const criteria = {
+            _id: { $in: data.ids.map((id: string) => new ObjectId(id)) },
+        };
 
-    public async updateNotifications(criteria: object, fields: object) {
-        return await this.notificationModel.updateMany(criteria, fields);
-    }
-
-    public async addNotification(data: AddNotificationData) {
-        const createdNotification = new this.notificationModel(new NotificationModelDataAdapter(data));
-
-        this.log.log('new notification ' + data + ' created');
-
-        return await createdNotification.save();
-    }
-
-    public async deleteNotification(id: string) {
-        return await this.notificationModel.findOneAndUpdate({ _id: id }, { $set: { isDeleted: true } });
+        const field = {
+            $set: { isRead: true },
+        };
+        return await this.notificationModelService.updateNotifications(criteria, field);
     }
 }
