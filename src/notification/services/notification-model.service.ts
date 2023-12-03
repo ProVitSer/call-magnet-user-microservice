@@ -5,6 +5,7 @@ import { Notification } from '../schemas/notification.schema';
 import { AddNotificationData } from '@app/platform-types/notification/interfaces';
 import { AppLoggerService } from '@app/app-logger/app-logger.service';
 import { NotificationModelDataAdapter } from '../adapters/notification-model-data.adapter';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class NotificationModelService {
@@ -35,6 +36,6 @@ export class NotificationModelService {
     }
 
     public async deleteNotification(id: string) {
-        return await this.notificationModel.findOneAndUpdate({ _id: id }, { $set: { isDeleted: true } });
+        return await this.notificationModel.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { isDeleted: true } });
     }
 }
