@@ -25,11 +25,15 @@ export class AddNotificationDto {
 
     @IsNotEmpty()
     @IsString()
-    title: string;
+    smallTitle: string;
 
     @IsNotEmpty()
     @IsString()
-    smalText: string;
+    fullTitle: string;
+
+    @IsNotEmpty()
+    @IsString()
+    smallText: string;
 
     @IsNotEmpty()
     @IsString()
