@@ -30,10 +30,13 @@ export class Notification extends Document {
     img?: string;
 
     @Prop({ type: String })
-    title: string;
+    smallTitle: string;
 
     @Prop({ type: String })
-    smalText: string;
+    fullTitle: string;
+
+    @Prop({ type: String })
+    smallText: string;
 
     @Prop({ type: String })
     html: string;
