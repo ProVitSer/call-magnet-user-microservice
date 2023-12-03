@@ -3,8 +3,10 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MessagePatternCmd } from '@app/platform-types/client-proxy/types';
 import { NotificationService } from './services/notification.service';
 import {
+    DelNotificationData,
     GetClientNotificationsData,
     GetClientNotificationsReponse,
+    GetNotificationListData,
     MarkNotificationsIsReadData,
 } from '@app/platform-types/notification/interfaces';
 import { Request, Response } from 'express';
@@ -28,5 +30,15 @@ export class NotificationController {
     @MessagePattern({ cmd: MessagePatternCmd.markNotificationsIsRead })
     async markNotificationsIsRead(@Payload() data: MarkNotificationsIsReadData) {
         return await this.notificationService.markNotificationsIsRead(data);
+    }
+
+    @MessagePattern({ cmd: MessagePatternCmd.delNotification })
+    async delNotification(@Payload() data: DelNotificationData) {
+        return await this.notificationService.delNotification(data);
+    }
+
+    @MessagePattern({ cmd: MessagePatternCmd.notificationList })
+    async getClientNotifications(@Payload() data: GetNotificationListData) {
+        return await this.notificationService.getNotificationList(data);
     }
 }
