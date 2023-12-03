@@ -7,8 +7,9 @@ export class NotificationModelDataAdapter {
     public avatarType: AvatarType;
     public icon: string;
     public img: string;
-    public title: string;
-    public smalText: string;
+    public smallTitle: string;
+    public fullTitle: string;
+    public smallText: string;
     public html: string;
     public link: string;
     public author: NotificationAuthor;
@@ -18,8 +19,9 @@ export class NotificationModelDataAdapter {
         this.avatarType = data?.avatarType || AvatarType.name;
         this.icon = data?.icon;
         this.img = data?.img;
-        this.title = data.title;
-        this.smalText = data.smalText;
+        this.smallTitle = data.smallTitle;
+        this.fullTitle = data.fullTitle;
+        this.smallText = data.smallText;
         this.html = data.html;
         this.link = data?.link || '';
         this.author = data?.author || {
