@@ -156,7 +156,7 @@ export const AUTO_DIAL_MENU: Menu[] = [
 
 export const KPI_MENU: Menu[] = [
     {
-        code: 7,
+        code: 6,
         name: 'KPI колл-центра',
         path: '',
         icon: 'ft-users',
@@ -192,7 +192,7 @@ export const KPI_MENU: Menu[] = [
 
 export const SMS_MENU: Menu[] = [
     {
-        code: 6,
+        code: 7,
         name: 'SMS',
         path: '',
         icon: 'icon-speech',
