@@ -28,7 +28,7 @@ export class NotificationService {
                 $match: { clientId: data.clientId, isDeleted: { $ne: true } },
             },
             {
-                $sort: { _id: -1 },
+                $sort: { _id: 1 },
             },
             {
                 $project: {
@@ -95,7 +95,7 @@ export class NotificationService {
                 $match: { clientId: data.clientId, isDeleted: { $ne: true } },
             },
             {
-                $sort: { _id: -1 },
+                $sort: { _id: 1 },
             },
             {
                 $skip: data.offset || 0,
