@@ -154,6 +154,42 @@ export const AUTO_DIAL_MENU: Menu[] = [
     },
 ];
 
+export const KPI_MENU: Menu[] = [
+    {
+        code: 7,
+        name: 'KPI колл-центра',
+        path: '',
+        icon: 'ft-users',
+        badge: '',
+        badgeClass: '',
+        externalLink: false,
+        group: {
+            lines: [
+                {
+                    code: 1,
+                    name: 'Статистика',
+                    path: '/sm/kpi/statistic',
+                    icon: 'ft-align-left',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+                {
+                    code: 2,
+                    name: 'Настройки',
+                    path: '/sm/kpi/settings',
+                    icon: 'ft-settings',
+                    badge: '',
+                    badgeClass: '',
+                    externalLink: false,
+                    group: { lines: [] },
+                },
+            ],
+        },
+    },
+];
+
 export const SMS_MENU: Menu[] = [
     {
         code: 6,
@@ -222,7 +258,7 @@ export const SMS_MENU: Menu[] = [
 
 export const TELEGRAM_MENU: Menu[] = [
     {
-        code: 7,
+        code: 8,
         name: 'Telegram',
         path: '',
         icon: 'icon-paper-plane',
@@ -263,4 +299,5 @@ export const STATIC_MENU_BY_ROLE: { [role in Role]: Menu[] } = {
     [Role.autoDial]: AUTO_DIAL_MENU,
     [Role.sms]: SMS_MENU,
     [Role.telegram]: TELEGRAM_MENU,
+    [Role.kpi]: KPI_MENU,
 };
