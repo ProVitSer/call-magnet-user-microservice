@@ -39,6 +39,7 @@ import { Status } from '@app/platform-types/user/types';
 import { UsersService } from '@app/users/services/users.service';
 import { ArgonUtilService } from '@app/utils/argon.service';
 import { LoginResponseDataAdapter } from '../adapters/login-response-data.adapter';
+import { NotificationService } from '@app/notification/services/notification.service';
 
 @Injectable()
 export class AuthService {
@@ -47,6 +48,7 @@ export class AuthService {
         private readonly log: AppLoggerService,
         private readonly tokenService: TokenService,
         private readonly usersService: UsersService,
+        private readonly notificationService: NotificationService,
     ) {}
 
     public async register(data: RegisterUser): Promise<RegisterUserResponse> {
@@ -93,6 +95,7 @@ export class AuthService {
         if (user.validationToken == data.token) {
             this.log.debug('verifyProfile : user ' + user.email + ' activated');
             await this.usersService.updateByClientId(user.clientId, { isEmailVerified: true, validationToken: null });
+            await this.notificationService.addWelcomeNotification(user.clientId);
             return {
                 clientId: user.clientId,
                 email: user.email,

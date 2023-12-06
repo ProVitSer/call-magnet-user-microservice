@@ -11,7 +11,7 @@ import {
 import { PipelineStage } from 'mongoose';
 import { AddNotificationDto } from '../dto/add-notification.dto';
 import { ObjectId } from 'mongodb';
-import { NOTIFICATIONS_INFO_PROJ } from '../notification.constants';
+import { DEFAULT_WELCOME_NOTIFICATION, NOTIFICATIONS_INFO_PROJ } from '../notification.constants';
 
 @Injectable()
 export class NotificationService {
@@ -112,5 +112,9 @@ export class NotificationService {
             },
         ];
         return await this.notificationModelService.getAggregateNotification(pipeline);
+    }
+
+    public async addWelcomeNotification(clientId: string): Promise<void> {
+        await this.addNotification({ clientId, ...DEFAULT_WELCOME_NOTIFICATION });
     }
 }

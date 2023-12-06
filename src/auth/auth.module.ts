@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { UsersModule } from '@app/users/users.module';
 import { ClientProxyProvide } from '@app/platform-types/client-proxy/types';
+import { NotificationModule } from '@app/notification/notification.module';
 
 const clientProxyProvider: Provider = {
     provide: ClientProxyProvide.mail,
@@ -22,7 +23,7 @@ const clientProxyProvider: Provider = {
 };
 
 @Module({
-    imports: [JwtModule.register({}), UsersModule],
+    imports: [JwtModule.register({}), UsersModule, NotificationModule],
     controllers: [AuthController],
     providers: [AuthService, TokenService, clientProxyProvider],
     exports: [AuthService, TokenService],
