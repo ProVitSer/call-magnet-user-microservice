@@ -17,11 +17,11 @@ export class AddNotificationDto {
 
     @IsOptional()
     @IsString()
-    icon: string;
+    icon?: string;
 
     @IsOptional()
     @IsString()
-    img: string;
+    img?: string;
 
     @IsNotEmpty()
     @IsString()
@@ -41,8 +41,8 @@ export class AddNotificationDto {
 
     @IsOptional()
     @IsString()
-    link: string;
+    link?: string;
 
     @IsOptional()
-    author: NotificationAuthor;
+    author?: NotificationAuthor;
 }
