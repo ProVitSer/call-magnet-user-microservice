@@ -23,7 +23,7 @@ export const BASE_ROLE_MENU: Menu[] = [
         group: { lines: [] },
     },
     {
-        code: 8,
+        code: 9,
         name: 'FAQ',
         path: '/sm/faq',
         icon: 'icon-question',
@@ -33,7 +33,7 @@ export const BASE_ROLE_MENU: Menu[] = [
         group: { lines: [] },
     },
     {
-        code: 9,
+        code: 10,
         name: 'Поддержка',
         path: 'https://icep.omnidesk.ru/',
         icon: 'ft-life-buoy',
