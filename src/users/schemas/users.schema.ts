@@ -25,6 +25,9 @@ export class User extends Document {
     @Prop({ required: true })
     company: string;
 
+    @Prop({ required: true })
+    simultaneousCall: number;
+
     @Prop({ type: String, unique: true })
     clientId: string;
 
